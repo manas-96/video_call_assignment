@@ -1,6 +1,6 @@
 # video_call_assignment
 
-A video call application with a login screen, a user list, and one-to-one video calling.
+A video call application with a login screen, a user list, and one-to-one video calling, built with an MVC architecture and using `provider` for state management.
 
 ## Getting Started
 

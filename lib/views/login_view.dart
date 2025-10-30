@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:video_call_assignment/screens/user_list_screen.dart';
+import 'package:video_call_assignment/views/user_list_view.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginView extends StatefulWidget {
+  const LoginView({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginView> createState() => _LoginViewState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginViewState extends State<LoginView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const UserListScreen(),
+                          builder: (context) => const UserListView(),
                         ),
                       );
                     } else {
