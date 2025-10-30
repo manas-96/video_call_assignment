@@ -17,8 +17,11 @@ class UserController with ChangeNotifier {
 
   Future<void> fetchUsers() async {
     try {
+      print("object");
       final response =
-          await http.get(Uri.parse('https://reqres.in/api/users'));
+          await http.get(Uri.parse('https://reqres.in/api/users'),headers: {
+            "x-api-key": "reqres-free-v1"
+          });
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         _users = (data['data'] as List)

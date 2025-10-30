@@ -38,6 +38,7 @@ dependencies:
   provider: ^6.1.2
   http: ^1.2.2
   shared_preferences: ^2.2.3
+  permission_handler:
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
 

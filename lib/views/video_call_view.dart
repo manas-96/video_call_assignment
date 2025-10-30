@@ -21,26 +21,26 @@ class _VideoCallViewState extends State<VideoCallView> {
 
   @override
   Widget build(BuildContext context) {
-    final videoCallController = Provider.of<VideoCallController>(context);
+    final controller = Provider.of<VideoCallController>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Video Call'),
+        title: const Text('Agora Video Call'),
+        centerTitle: true,
       ),
       body: Stack(
         children: [
-          Center(
-            child: _remoteVideo(videoCallController),
-          ),
-          Align(
-            alignment: Alignment.topLeft,
+          Center(child: _remoteVideo(controller)),
+          Positioned(
+            top: 20,
+            left: 20,
             child: SizedBox(
-              width: 100,
-              height: 150,
-              child: _localVideo(videoCallController),
+              width: 120,
+              height: 160,
+              child: _localVideo(controller),
             ),
           ),
-          _toolbar(videoCallController),
+          _toolbar(controller),
         ],
       ),
     );
@@ -52,12 +52,13 @@ class _VideoCallViewState extends State<VideoCallView> {
         controller: VideoViewController.remote(
           rtcEngine: controller.engine!,
           canvas: VideoCanvas(uid: controller.remoteUid),
-          connection: const RtcConnection(channelId: 'test'),
+          connection:
+          const RtcConnection(channelId: 'test_video'), // match your channel
         ),
       );
     } else {
       return const Text(
-        'Waiting for remote user to join',
+        'Waiting for remote user to join...',
         textAlign: TextAlign.center,
       );
     }
@@ -72,82 +73,74 @@ class _VideoCallViewState extends State<VideoCallView> {
         ),
       );
     } else {
-      return const CircularProgressIndicator();
+      return const Center(child: CircularProgressIndicator());
     }
   }
 
   Widget _toolbar(VideoCallController controller) {
-    return Container(
+    return Align(
       alignment: Alignment.bottomCenter,
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          RawMaterialButton(
-            onPressed: controller.toggleMute,
-            shape: const CircleBorder(),
-            elevation: 2.0,
-            fillColor: controller.isMuted ? Colors.blueAccent : Colors.white,
-            padding: const EdgeInsets.all(12.0),
-            child: Icon(
-              controller.isMuted ? Icons.mic_off : Icons.mic,
-              color: controller.isMuted ? Colors.white : Colors.blueAccent,
-              size: 20.0,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 40),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _circleButton(
+              icon: controller.isMuted ? Icons.mic_off : Icons.mic,
+              color: controller.isMuted ? Colors.blueAccent : Colors.white,
+              iconColor:
+              controller.isMuted ? Colors.white : Colors.blueAccent,
+              onPressed: controller.toggleMute,
             ),
-          ),
-          RawMaterialButton(
-            onPressed: () => Navigator.pop(context),
-            shape: const CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.redAccent,
-            padding: const EdgeInsets.all(15.0),
-            child: const Icon(
-              Icons.call_end,
-              color: Colors.white,
-              size: 35.0,
+            _circleButton(
+              icon: Icons.call_end,
+              color: Colors.redAccent,
+              iconColor: Colors.white,
+              onPressed: () => Navigator.pop(context),
+              padding: 20,
             ),
-          ),
-          RawMaterialButton(
-            onPressed: controller.toggleVideo,
-            shape: const CircleBorder(),
-            elevation: 2.0,
-            fillColor:
-                controller.isVideoDisabled ? Colors.blueAccent : Colors.white,
-            padding: const EdgeInsets.all(12.0),
-            child: Icon(
+            _circleButton(
+              icon:
               controller.isVideoDisabled ? Icons.videocam_off : Icons.videocam,
               color: controller.isVideoDisabled
+                  ? Colors.blueAccent
+                  : Colors.white,
+              iconColor: controller.isVideoDisabled
                   ? Colors.white
                   : Colors.blueAccent,
-              size: 20.0,
+              onPressed: controller.toggleVideo,
             ),
-          ),
-          RawMaterialButton(
-            onPressed: controller.switchCamera,
-            shape: const CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
-            child: const Icon(
-              Icons.switch_camera,
-              color: Colors.blueAccent,
-              size: 20.0,
+            _circleButton(
+              icon: Icons.switch_camera,
+              color: Colors.white,
+              iconColor: Colors.blueAccent,
+              onPressed: controller.switchCamera,
             ),
-          ),
-          RawMaterialButton(
-            onPressed: controller.screenShare,
-            shape: const CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
-            child: const Icon(
-              Icons.screen_share,
-              color: Colors.blueAccent,
-              size: 20.0,
+            _circleButton(
+              icon: Icons.screen_share,
+              color: Colors.white,
+              iconColor: Colors.blueAccent,
+              onPressed: controller.startScreenShare,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _circleButton({
+    required IconData icon,
+    required Color color,
+    required Color iconColor,
+    required VoidCallback onPressed,
+    double padding = 14,
+  }) {
+    return RawMaterialButton(
+      onPressed: onPressed,
+      shape: const CircleBorder(),
+      fillColor: color,
+      padding: EdgeInsets.all(padding),
+      child: Icon(icon, color: iconColor, size: 22),
     );
   }
 }

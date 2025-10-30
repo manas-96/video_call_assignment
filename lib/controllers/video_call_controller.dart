@@ -1,29 +1,38 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class VideoCallController with ChangeNotifier {
   RtcEngine? _engine;
-  bool _isJoined = false;
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isMuted = false;
   bool _isVideoDisabled = false;
 
-  bool get isJoined => _isJoined;
+  // Getters
+  RtcEngine? get engine => _engine;
   int? get remoteUid => _remoteUid;
   bool get localUserJoined => _localUserJoined;
   bool get isMuted => _isMuted;
   bool get isVideoDisabled => _isVideoDisabled;
-  RtcEngine? get engine => _engine;
 
+  // Replace these with your actual values
   final String _appId = 'b964402a29a645cbb7eddae315f6753f';
-  final String _channelName = 'test';
+  final String _channelName = 'test_video';
   final String _token =
-      '007eJxTYDjpMKVm5fqPbd4LFi8/YJqWte9Qxk+Xa/HK86a0/P23p/ugAkOSpZmJiYFRopFlopmJaXJSknlqSkpiqrGhaZqZualxWocpc2ZDICODjfFaZkYGCATxWRhKUotLGBgARlkh/w==';
+      '007eJxTYBDcNHeVdY+B9rJ/Z0U1TGdztIYsStZ/pLaOTWPne4sSyzMKDEmWZiYmBkaJRpaJZiamyUlJ5qkpKYmpxoamaWbmpsZpXTnMmQ2BjAxNDCbMjAwQCOJzMZSkFpfEl2WmpOYzMAAAYO0fMg==';
 
+  /// Initialize Agora engine and join channel
   Future<void> initAgora() async {
+    await [Permission.camera, Permission.microphone].request();
+
     _engine = createAgoraRtcEngine();
-    await _engine!.initialize(RtcEngineContext(appId: _appId));
+    await _engine!.initialize(
+      const RtcEngineContext(
+        appId: 'b964402a29a645cbb7eddae315f6753f',
+        channelProfile: ChannelProfileType.channelProfileCommunication,
+      ),
+    );
 
     _engine!.registerEventHandler(
       RtcEngineEventHandler(
@@ -40,11 +49,15 @@ class VideoCallController with ChangeNotifier {
           _remoteUid = null;
           notifyListeners();
         },
+        onError: (err, msg) {
+          if (kDebugMode) print("Agora Error: $err - $msg");
+        },
       ),
     );
 
     await _engine!.enableVideo();
     await _engine!.startPreview();
+
     await _engine!.joinChannel(
       token: _token,
       channelId: _channelName,
@@ -53,34 +66,44 @@ class VideoCallController with ChangeNotifier {
     );
   }
 
+  /// Mute/unmute audio
   void toggleMute() {
     _isMuted = !_isMuted;
-    _engine!.muteLocalAudioStream(_isMuted);
+    _engine?.muteLocalAudioStream(_isMuted);
     notifyListeners();
   }
 
+  /// Enable/disable local video
   void toggleVideo() {
     _isVideoDisabled = !_isVideoDisabled;
-    _engine!.enableLocalVideo(!_isVideoDisabled);
+    _engine?.enableLocalVideo(!_isVideoDisabled);
     notifyListeners();
   }
 
+  /// Switch camera
   void switchCamera() {
-    _engine!.switchCamera();
+    _engine?.switchCamera();
   }
 
-  void screenShare() async {
-    await _engine!.startScreenCapture(const ScreenCaptureParameters2(
-        captureAudio: true,
-        audioParams: ScreenAudioParameters(
-            sampleRate: 16000, channels: 2, captureSignalVolume: 100),
-        captureVideo: true,
-        videoParams: ScreenVideoParameters(
-            dimensions: VideoDimensions(height: 1920, width: 1080),
-            frameRate: 15,
-            bitrate: 6000)));
+  /// Start screen sharing
+  Future<void> startScreenShare() async {
+    await _engine?.startScreenCapture(const ScreenCaptureParameters2(
+      captureAudio: true,
+      audioParams: ScreenAudioParameters(
+        sampleRate: 16000,
+        channels: 2,
+        captureSignalVolume: 100,
+      ),
+      captureVideo: true,
+      videoParams: ScreenVideoParameters(
+        dimensions: VideoDimensions(width: 1280, height: 720),
+        frameRate: 15,
+        bitrate: 4000,
+      ),
+    ));
   }
 
+  /// Cleanup
   @override
   void dispose() {
     _engine?.leaveChannel();
