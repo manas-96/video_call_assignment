@@ -34,6 +34,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  agora_uikit: ^1.3.9
+  http: ^1.2.2
+  shared_preferences: ^2.2.3
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -51,7 +56,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -59,8 +63,17 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - images/
+    - images/
   #   - images/a_dot_ham.jpeg
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/logo.png"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: images/logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
